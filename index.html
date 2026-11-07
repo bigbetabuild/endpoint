@@ -82,8 +82,8 @@
         <button class="reset" id="reset" type="button">Clear sequence</button>
       </section>
       <section class="video-wrap" id="video-wrap" aria-label="Unlocked video">
-        <video id="video" controls playsinline preload="none" aria-label="A flower moving in the breeze">
-          <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" type="video/mp4">
+        <video id="video" controls playsinline preload="metadata" aria-label="Unlocked transmission video">
+          <source src="2026-11-07%2019-35-54.mp4" type="video/mp4">
           Your browser does not support HTML video.
         </video>
         <div class="video-caption">Transmission unlocked · signal 001</div>
@@ -119,11 +119,22 @@
       document.addEventListener('keydown', (event) => {
         if (event.ctrlKey || event.metaKey || event.altKey || event.key.length !== 1 || !/[a-z]/i.test(event.key)) return;
         if (videoWrap.classList.contains('visible')) return;
-        entered += event.key.toUpperCase();
-        if (!answer.startsWith(entered)) {
-          entered = event.key.toUpperCase() === answer[0] ? event.key.toUpperCase() : '';
+
+        const next = event.key.toUpperCase();
+        const allowedPrefix = answer.slice(0, entered.length + 1);
+
+        if (entered.length < answer.length) {
+          entered += next;
+        }
+
+        if (entered !== answer.slice(0, entered.length)) {
+          entered = '';
           hint.textContent = 'Not quite — try another sequence.';
-        } else if (entered === answer) {
+          render();
+          return;
+        }
+
+        if (entered === answer) {
           hint.textContent = 'Signal found. Playing transmission…';
           hint.classList.add('success');
           videoWrap.classList.add('visible');
@@ -133,10 +144,11 @@
         } else {
           hint.textContent = 'Signal received… keep going.';
         }
-        render();
+      render();
       });
 
       document.getElementById('reset').addEventListener('click', clear);
+      render();
     })();
   </script>
 </body>
